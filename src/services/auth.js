@@ -4,16 +4,7 @@ import axios from 'axios';
 // URL base da API
 const API_URL = 'http://localhost:8080/api/auth/';
 
-/**
- * Serviço de autenticação para login, registro e gerenciamento de usuários
- */
 class AuthService {
-  /**
-   * Fazer login de usuário
-   * @param {string} username - Nome de usuário ou email
-   * @param {string} password - Senha do usuário
-   * @returns {Promise} Promise com os dados do usuário e token JWT
-   */
   async login(username, password) {
     try {
       const response = await axios.post(API_URL + 'signin', {
@@ -26,7 +17,7 @@ class AuthService {
         localStorage.setItem('user', JSON.stringify(response.data));
         
         // Define o token para todas as requisições subsequentes
-        axios.defaults.headers.common['Authorization'] = 'Bearer ' + response.data.token;
+        this.setAuthHeader(response.data.token);
       }
       
       return response.data;
@@ -36,57 +27,51 @@ class AuthService {
     }
   }
 
-  /**
-   * Fazer logout do usuário
-   */
   logout() {
     localStorage.removeItem('user');
     delete axios.defaults.headers.common['Authorization'];
   }
 
-  /**
-   * Registrar um novo usuário
-   * @param {Object} userData - Dados do usuário (username, email, password)
-   * @returns {Promise} Promise com a resposta do registro
-   */
-  async register(userData) {
-    try {
-      return await axios.post(API_URL + 'signup', userData);
-    } catch (error) {
-      console.error('Erro ao registrar usuário:', error);
-      throw error;
+  setAuthHeader(token) {
+    if (token) {
+      axios.defaults.headers.common['Authorization'] = 'Bearer ' + token;
+    } else {
+      delete axios.defaults.headers.common['Authorization'];
     }
   }
 
-  /**
-   * Verifica se o usuário está autenticado e atualiza o cabeçalho de autorização
-   * @returns {boolean} Verdadeiro se o usuário estiver autenticado
-   */
   isAuthenticated() {
     const user = this.getCurrentUser();
     if (user && user.token) {
-      axios.defaults.headers.common['Authorization'] = 'Bearer ' + user.token;
+      this.setAuthHeader(user.token);
       return true;
     }
     return false;
   }
 
-  /**
-   * Obtém os dados do usuário atual do armazenamento local
-   * @returns {Object|null} Dados do usuário ou null se não estiver autenticado
-   */
   getCurrentUser() {
-    return JSON.parse(localStorage.getItem('user'));
+    try {
+      const userStr = localStorage.getItem('user');
+      return userStr ? JSON.parse(userStr) : null;
+    } catch (error) {
+      console.error('Erro ao obter usuário atual:', error);
+      return null;
+    }
   }
 
-  /**
-   * Verifica se o usuário atual tem permissão de administrador
-   * @returns {boolean} Verdadeiro se o usuário for administrador
-   */
   isAdmin() {
     const user = this.getCurrentUser();
     return user && user.roles && user.roles.includes('ROLE_ADMIN');
   }
 }
 
-export default new AuthService();
+// Instância singleton
+const authService = new AuthService();
+
+// Inicializa o token de autenticação se o usuário estiver logado
+const user = authService.getCurrentUser();
+if (user && user.token) {
+  authService.setAuthHeader(user.token);
+}
+
+export default authService;

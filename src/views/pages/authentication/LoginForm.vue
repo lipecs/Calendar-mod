@@ -1,4 +1,4 @@
-<!-- src/views/pages/authentication/LoginForm.vue -->
+// src/views/pages/authentication/LoginForm.vue
 <script setup>
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
@@ -12,7 +12,7 @@ const router = useRouter();
 const isLoading = ref(false);
 const error = ref('');
 const credentials = ref({
-  username: '',
+  email: '',
   password: ''
 });
 const rememberMe = ref(false);

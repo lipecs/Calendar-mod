@@ -1,4 +1,4 @@
-<!-- src/layouts/components/UserProfile.vue (modificado) -->
+// src/layouts/components/UserProfile.vue
 <script setup>
 import authService from '@/services/auth';
 import { computed } from 'vue';

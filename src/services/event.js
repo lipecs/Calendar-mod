@@ -5,28 +5,23 @@ import authService from './auth';
 // URL base da API
 const API_URL = 'http://localhost:8080/api/events';
 
-/**
- * Serviço para gerenciamento de eventos do calendário
- */
 class EventService {
-  /**
-   * Obtém todos os eventos do calendário do usuário atual
-   * @param {string} calendars - Opcional: Filtro de calendários separados por vírgula
-   * @returns {Promise} Promise com a lista de eventos
-   */
-  async getEvents(calendars) {
+  async getEvents(calendars, userId) {
     try {
-      // Garante que o token de autenticação esteja definido
       authService.isAuthenticated();
       
       let url = API_URL;
+      let params = {};
       
-      // Adiciona parâmetros de consulta se fornecidos
       if (calendars) {
-        url += `?calendars=${encodeURIComponent(calendars)}`;
+        params.calendars = calendars;
       }
       
-      const response = await axios.get(url);
+      if (userId) {
+        params.userId = userId;
+      }
+      
+      const response = await axios.get(url, { params });
       return response.data;
     } catch (error) {
       console.error('Erro ao buscar eventos:', error);
@@ -34,16 +29,9 @@ class EventService {
     }
   }
 
-  /**
-   * Obtém um evento específico por ID
-   * @param {number} id - ID do evento
-   * @returns {Promise} Promise com os dados do evento
-   */
   async getEventById(id) {
     try {
-      // Garante que o token de autenticação esteja definido
       authService.isAuthenticated();
-      
       const response = await axios.get(`${API_URL}/${id}`);
       return response.data;
     } catch (error) {
@@ -52,14 +40,8 @@ class EventService {
     }
   }
 
-  /**
-   * Cria um novo evento no calendário
-   * @param {Object} eventData - Dados do evento
-   * @returns {Promise} Promise com a resposta da criação
-   */
   async createEvent(eventData) {
     try {
-      // Garante que o token de autenticação esteja definido
       authService.isAuthenticated();
       
       // Adiciona o ID do usuário atual ao evento
@@ -76,17 +58,9 @@ class EventService {
     }
   }
 
-  /**
-   * Atualiza um evento existente
-   * @param {number} id - ID do evento
-   * @param {Object} eventData - Dados atualizados do evento
-   * @returns {Promise} Promise com a resposta da atualização
-   */
   async updateEvent(id, eventData) {
     try {
-      // Garante que o token de autenticação esteja definido
       authService.isAuthenticated();
-      
       const response = await axios.put(`${API_URL}/${id}`, eventData);
       return response.data;
     } catch (error) {
@@ -95,16 +69,9 @@ class EventService {
     }
   }
 
-  /**
-   * Exclui um evento
-   * @param {number} id - ID do evento
-   * @returns {Promise} Promise com a resposta da exclusão
-   */
   async deleteEvent(id) {
     try {
-      // Garante que o token de autenticação esteja definido
       authService.isAuthenticated();
-      
       const response = await axios.delete(`${API_URL}/${id}`);
       return response.data;
     } catch (error) {

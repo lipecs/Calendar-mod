@@ -1,4 +1,4 @@
-<!-- src/pages/not-authorized.vue (modificado) -->
+// src/pages/not-authorized.vue
 <script setup>
 import miscMaskDark from '@images/misc/misc-mask-dark.png';
 import miscMaskLight from '@images/misc/misc-mask-light.png';

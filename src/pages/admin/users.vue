@@ -1,4 +1,4 @@
-<!-- src/pages/admin/users.vue (continuação) -->
+// src/pages/admin/users.vue
 <script setup>
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
@@ -21,7 +21,8 @@ definePage({
         title: 'Usuários',
         active: true
       }
-    ]
+    ],
+    adminRequired: true // Requer permissão de administrador
   }
 });
 

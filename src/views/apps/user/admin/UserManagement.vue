@@ -1,4 +1,4 @@
-<!-- src/views/apps/user/admin/UserManagement.vue (continuação) -->
+// src/views/apps/user/admin/UserManagement.vue
 <script setup>
 import { ref, onMounted } from 'vue';
 import userService from '@/services/user';
@@ -15,18 +15,18 @@ const currentUserId = ref(null);
 
 // Estado de alerta para feedback
 const alert = ref({
-  show: false,
-  type: 'success',
-  message: ''
+    show: false,
+    type: 'success',
+    message: ''
 });
 
 // Formulário de usuário
 const userForm = ref({
-  username: '',
-  email: '',
-  password: '',
-  confirmPassword: '',
-  role: ['user'] // Default role
+    username: '',
+    email: '',
+    password: '',
+    confirmPassword: '',
+    role: ['user'] // Default role
 });
 
 // Erros de validação
@@ -34,117 +34,117 @@ const formErrors = ref({});
 
 // Opções para o dropdown de papéis
 const roles = [
-  { title: t('Admin'), value: 'admin' },
-  { title: t('User'), value: 'user' }
+    { title: t('Admin'), value: 'admin' },
+    { title: t('User'), value: 'user' }
 ];
 
 // Carrega a lista de usuários
 const fetchUsers = async () => {
-  try {
-    isLoading.value = true;
-    const data = await userService.getAllUsers();
-    users.value = data;
-    isLoading.value = false;
-  } catch (error) {
-    console.error('Erro ao buscar usuários:', error);
-    showAlert('error', t('Erro ao carregar usuários') + ': ' + (error.response?.data?.message || error.message));
-    isLoading.value = false;
-  }
+    try {
+        isLoading.value = true;
+        const data = await userService.getAllUsers();
+        users.value = data;
+        isLoading.value = false;
+    } catch (error) {
+        console.error('Erro ao buscar usuários:', error);
+        showAlert('error', t('Erro ao carregar usuários') + ': ' + (error.response?.data?.message || error.message));
+        isLoading.value = false;
+    }
 };
 
 // Abrir o drawer para adicionar novo usuário
 const openAddUserDrawer = () => {
-  isEditMode.value = false;
-  resetForm();
-  isUserDrawerOpen.value = true;
+    isEditMode.value = false;
+    resetForm();
+    isUserDrawerOpen.value = true;
 };
 
 // Abrir o drawer para editar usuário existente
 const openEditUserDrawer = (user) => {
-  isEditMode.value = true;
-  currentUserId.value = user.id;
-  
-  // Extrair as roles para o formulário
-  const userRoles = user.roles.map(role => 
-    role.name === 'ROLE_ADMIN' ? 'admin' : 'user'
-  );
-  
-  userForm.value = {
-    username: user.username,
-    email: user.email,
-    password: '',
-    confirmPassword: '',
-    role: userRoles
-  };
-  
-  isUserDrawerOpen.value = true;
+    isEditMode.value = true;
+    currentUserId.value = user.id;
+
+    // Extrair as roles para o formulário
+    const userRoles = user.roles.map(role =>
+        role.name === 'ROLE_ADMIN' ? 'admin' : 'user'
+    );
+
+    userForm.value = {
+        username: user.username,
+        email: user.email,
+        password: '',
+        confirmPassword: '',
+        role: userRoles
+    };
+
+    isUserDrawerOpen.value = true;
 };
 
 // Resetar formulário
 const resetForm = () => {
-  userForm.value = {
-    username: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
-    role: ['user']
-  };
-  formErrors.value = {};
+    userForm.value = {
+        username: '',
+        email: '',
+        password: '',
+        confirmPassword: '',
+        role: ['user']
+    };
+    formErrors.value = {};
 };
 
 // Validar formulário
 const validateForm = () => {
-  const errors = {};
-  
-  if (!userForm.value.username.trim()) {
-    errors.username = t('O nome de usuário é obrigatório');
-  }
-  
-  if (!userForm.value.email.trim()) {
-    errors.email = t('O email é obrigatório');
-  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(userForm.value.email)) {
-    errors.email = t('Por favor, insira um email válido');
-  }
-  
-  if (!isEditMode.value) {
-    if (!userForm.value.password) {
-      errors.password = t('A senha é obrigatória');
-    } else if (userForm.value.password.length < 6) {
-      errors.password = t('A senha deve ter pelo menos 6 caracteres');
+    const errors = {};
+
+    if (!userForm.value.username.trim()) {
+        errors.username = t('O nome de usuário é obrigatório');
     }
-    
-    if (userForm.value.password !== userForm.value.confirmPassword) {
-      errors.confirmPassword = t('As senhas não coincidem');
+
+    if (!userForm.value.email.trim()) {
+        errors.email = t('O email é obrigatório');
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(userForm.value.email)) {
+        errors.email = t('Por favor, insira um email válido');
     }
-  } else if (userForm.value.password && userForm.value.password !== userForm.value.confirmPassword) {
-    errors.confirmPassword = t('As senhas não coincidem');
-  }
-  
-  formErrors.value = errors;
-  return Object.keys(errors).length === 0;
+
+    if (!isEditMode.value) {
+        if (!userForm.value.password) {
+            errors.password = t('A senha é obrigatória');
+        } else if (userForm.value.password.length < 6) {
+            errors.password = t('A senha deve ter pelo menos 6 caracteres');
+        }
+
+        if (userForm.value.password !== userForm.value.confirmPassword) {
+            errors.confirmPassword = t('As senhas não coincidem');
+        }
+    } else if (userForm.value.password && userForm.value.password !== userForm.value.confirmPassword) {
+        errors.confirmPassword = t('As senhas não coincidem');
+    }
+
+    formErrors.value = errors;
+    return Object.keys(errors).length === 0;
 };
 
 // Salvar usuário (criar ou atualizar)
 const saveUser = async () => {
-  if (!validateForm()) return;
-  
-  try {
-    isLoading.value = true;
-    
-    // Preparar dados para envio
-    const userData = {
-      username: userForm.value.username,
-      email: userForm.value.email,
-      role: new Set(userForm.value.role)
-    };
-    
-    // Adicionar senha apenas se fornecida
-    if (userForm.value.password) {
-      userData.password = userForm.value.password;
-    }
-    
-    let response;
-    if (isEditMode.value) {
+    if (!validateForm()) return;
+
+    try {
+        isLoading.value = true;
+
+        // Preparar dados para envio
+        const userData = {
+            username: userForm.value.username,
+            email: userForm.value.email,
+            role: new Set(userForm.value.role)
+        };
+
+        // Adicionar senha apenas se fornecida
+        if (userForm.value.password) {
+            userData.password = userForm.value.password;
+        }
+
+        let response;
+      if (isEditMode.value) {
       response = await userService.updateUser(currentUserId.value, userData);
       showAlert('success', t('Usuário atualizado com sucesso!'));
     } else {
